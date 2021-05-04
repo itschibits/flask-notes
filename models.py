@@ -1,5 +1,6 @@
 """Models for Notes app"""
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 
 db = SQLAlchemy()
 
@@ -27,3 +28,22 @@ class User(db.Model):
                            nullable=False)
     last_name = db.Column(db.String(30),
                           nullable=False)
+                          
+
+    @classmethod
+    def register(cls, username, password, email, first_name, last_name):
+    """Register user w/hashed password & return user."""
+        hashed = bcrypt.generate_password_hash(password).decode('utf8')
+        # return instance of user w/username and hashed pwd
+        return cls(username=username, password=hashed, email=email, first_name=first_name, last_name=last_name )
+
+    @classmethod
+    def authenticate(cls, username, password):
+    """ Authenticate username and password, returns user if valid, false if invalid"""
+        user = cls.query.filter_by(username=username).first()
+       if user and bcrypt.check_password_hash(user.password, password):
+            # return user instance
+            return user
+        else:
+            return False
+
