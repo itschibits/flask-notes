@@ -5,7 +5,7 @@ import email_validator
 
 
 class AddUserForm(FlaskForm):
-    """From to register users"""
+    """Form to register users"""
     username = StringField('Username',
                            validators=[InputRequired(),
                                        Length(max=20)])
@@ -27,4 +27,11 @@ class AddUserForm(FlaskForm):
                                         Length(max=30)])
 
 
+class LogInForm(FlaskForm):
+    """Form to login users"""
+    username = StringField('Username',
+                           validators=[InputRequired(),
+                                       Length(max=20)])
 
+    password = PasswordField('Password',
+                             validators=[DataRequired()])

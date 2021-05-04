@@ -1,7 +1,7 @@
 """Flask app for notes"""
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, session, flash
 from models import db, connect_db, User
-from forms import AddUserForm
+from forms import AddUserForm, LogInForm
 from project_secrets import FLASK_SECRET_KEY
 
 
@@ -35,7 +35,7 @@ def register_user():
         db.session.add(user)
         db.session.commit()
         session['username'] = user.username
-        return redirect("/secret")
+        return redirect(f"/users/{user.username}")
     else:
         return render_template("register.html", form=form)
 
@@ -55,8 +55,28 @@ def login_user():
 
         if user:
             session['username'] = user.username
-            return redirect('/secret')
+            return redirect(f'/users/{user.username}')
         else:
-            form.username.errors= ['Invalid username/password']
+            form.username.errors = ['Invalid username/password']
             return render_template("login.html", form=form)
-        
+    else:
+        return render_template("login.html", form=form)
+
+
+@app.route('/users/<username>')
+def show_user(username):
+    """Show user page"""
+    if "username" not in session or session["username"] != username:
+        flash("You must be logged in to view!")
+        return redirect("/")
+    else:
+        user = User.query.get_or_404(username)
+        return render_template("user.html", user=user)
+
+
+@app.route("/logout")
+def logout():
+    """Logs user out and redirects to homepage."""
+    session.pop("username", None)
+
+    return redirect("/")
