@@ -1,6 +1,6 @@
 """Flask app for notes"""
 from flask import Flask, request, render_template, redirect, session, flash
-from models import db, connect_db, User
+from models import db, connect_db, User, Note
 from forms import AddUserForm, LogInForm
 from project_secrets import FLASK_SECRET_KEY
 
